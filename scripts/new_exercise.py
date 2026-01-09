@@ -176,9 +176,10 @@ def main() -> int:
 
     ex_dir = ROOT / "exercises" / exercise_key
     nb_path = ROOT / "notebooks" / f"{exercise_key}.ipynb"
+    nb_solution_path = ROOT / "notebooks" / "solutions" / f"{exercise_key}.ipynb"
     test_path = ROOT / "tests" / f"test_{exercise_key}.py"
 
-    if ex_dir.exists() or nb_path.exists() or test_path.exists():
+    if ex_dir.exists() or nb_path.exists() or nb_solution_path.exists() or test_path.exists():
         raise SystemExit(f"Exercise already exists: {exercise_key}")
 
     ex_dir.mkdir(parents=True)
@@ -245,9 +246,16 @@ def main() -> int:
     notebook = _make_notebook_with_parts(args.title, parts=args.parts)
     nb_path.write_text(json.dumps(notebook, indent=2), encoding="utf-8")
 
+    # Create a mirrored notebook for teacher solutions.
+    # By default it's identical to the student notebook; teachers can fill in
+    # the tagged exercise cell(s) to verify tests pass against known-good code.
+    nb_solution_path.parent.mkdir(parents=True, exist_ok=True)
+    nb_solution_path.write_text(json.dumps(notebook, indent=2), encoding="utf-8")
+
     print(f"Created exercise: {exercise_key}")
     print(f"- {ex_dir.relative_to(ROOT)}")
     print(f"- {nb_path.relative_to(ROOT)}")
+    print(f"- {nb_solution_path.relative_to(ROOT)}")
     print(f"- {test_path.relative_to(ROOT)}")
     return 0
 

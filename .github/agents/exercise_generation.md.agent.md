@@ -9,6 +9,18 @@ You are helping a teacher create new Python exercises in this repository.
 
 ## Core idea (how grading works)
 
+This repo supports two parallel notebook sets:
+
+- Student notebooks live in `notebooks/` and contain unfinished work.
+- Solution mirrors live in `notebooks/solutions/` and are duplicates of the student notebooks with the tagged exercise cells filled in.
+
+The same pytest tests can be run against either set:
+
+- Default (student notebooks): `pytest -q`
+- Solution verification: `PYTUTOR_NOTEBOOKS_DIR=notebooks/solutions pytest -q`
+
+This is used to quickly confirm the tests are correct (they pass on the known-good solution notebooks) and that the student notebooks still fail until students make changes.
+
 ## Pedagogical Approach
 
 The goal of these exercises is to take students from being complete Python beginners at the beginning of secondary school to covering all computational constructs required by A-Level Computer Science.
@@ -300,6 +312,7 @@ Below is a JSON-formatted example that matches the notebook format used by the g
 This creates:
   - `exercises/CONSTRUCT/TYPE/exNNN_slug/README.md` (where CONSTRUCT is sequence, selection, iteration, etc. and TYPE is debug, modify, or make)
   - `notebooks/exNNN_slug.ipynb`
+  - `notebooks/solutions/exNNN_slug.ipynb` (solution mirror; initially identical)
   - `tests/test_exNNN_slug.py`
 
 ### Required repository files for each exercise
@@ -374,6 +387,11 @@ Test design checklist:
 
 5) Verify
 - Run `pytest -q` locally.
+
+Also verify the tests pass against the solution mirror:
+
+- Either: `PYTUTOR_NOTEBOOKS_DIR=notebooks/solutions pytest -q`
+- Or (recommended): `scripts/verify_solutions.sh -q`
 
 If tests fail locally, update only the tests or notebook relevant to the exercise — do not modify unrelated exercises or global test configuration.
 

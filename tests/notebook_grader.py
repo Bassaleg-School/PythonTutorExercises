@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import re
+import os
 from pathlib import Path
 from typing import Any
 
@@ -10,8 +11,36 @@ class NotebookGradingError(RuntimeError):
     pass
 
 
+def resolve_notebook_path(notebook_path: str | Path) -> Path:
+    """Resolve a notebook path, optionally redirecting to a mirrored notebooks dir.
+
+    Set the environment variable `PYTUTOR_NOTEBOOKS_DIR` to point tests at an
+    alternate notebook root (for example: `notebooks/solutions`).
+
+    This allows the same tests to run against either student notebooks
+    (default) or solution notebooks (mirrors).
+    """
+
+    original = Path(notebook_path)
+    override_root = os.environ.get("PYTUTOR_NOTEBOOKS_DIR")
+    if not override_root:
+        return original
+
+    override_root_path = Path(override_root)
+
+    try:
+        rel = original.relative_to("notebooks")
+    except ValueError:
+        # If a caller passes something that isn't under notebooks/, we still
+        # allow overriding by using the filename.
+        rel = Path(original.name)
+
+    candidate = override_root_path / rel
+    return candidate if candidate.exists() else original
+
+
 def _read_notebook(notebook_path: str | Path) -> dict[str, Any]:
-    path = Path(notebook_path)
+    path = resolve_notebook_path(notebook_path)
     if not path.exists():
         raise NotebookGradingError(f"Notebook not found: {path}")
 

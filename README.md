@@ -7,6 +7,7 @@ Notebook-based Python exercises with automated grading via `pytest` (GitHub Clas
 - `notebooks/`
 	- One notebook per exercise: `notebooks/exNNN_slug.ipynb`
 	- Students write code **inline** in a dedicated exercise cell that **must** be tagged with `exerciseN` in the cell metadata (e.g., `exercise1`, `exercise2`). Marker comments like `# STUDENT` or `# STUDENT exercise1` are deprecated and will **not** be accepted by the autograder.
+	- Teacher/CI solution mirrors (optional): `notebooks/solutions/exNNN_slug.ipynb`
 - `tests/`
 	- `tests/test_exNNN_slug.py` contains automated tests
 	- Tests extract + execute the student cell (see `tests/notebook_grader.py`)
@@ -34,6 +35,18 @@ Run all tests:
 pytest -q
 ```
 
+Run the same tests against solution notebooks:
+
+```bash
+PYTUTOR_NOTEBOOKS_DIR=notebooks/solutions pytest -q
+```
+
+Shortcut helper:
+
+```bash
+scripts/verify_solutions.sh -q
+```
+
 ## Create a new exercise
 
 ```bash
@@ -48,6 +61,7 @@ python scripts/new_exercise.py ex010 "Week 1" --slug week1 --parts 3
 
 This creates:
 - `notebooks/ex001_variables_and_types.ipynb`
+- `notebooks/solutions/ex001_variables_and_types.ipynb`
 - `tests/test_ex001_variables_and_types.py`
 
 And (optional):
