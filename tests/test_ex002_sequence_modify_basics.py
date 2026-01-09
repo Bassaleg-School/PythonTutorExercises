@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import io
 import sys
+
 import pytest
 
 from tests.notebook_grader import exec_tagged_code
