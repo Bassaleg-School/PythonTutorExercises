@@ -19,6 +19,48 @@ class FileCollector:
         self.tests_dir = repo_root / "tests"
         self.exercises_dir = repo_root / "exercises"
 
+    def _check_type_dir_for_metadata(
+        self, type_dir: Path, exercise_id: str
+    ) -> Path | None:
+        """Check a type directory for exercise metadata.
+        
+        Args:
+            type_dir: Type directory to search.
+            exercise_id: Exercise ID to find.
+            
+        Returns:
+            Path to README.md if found, None otherwise.
+        """
+        ex_dir = type_dir / exercise_id
+        if ex_dir.exists():
+            readme = ex_dir / "README.md"
+            if readme.exists():
+                return readme
+        return None
+
+    def _check_nested_metadata(self, exercise_id: str) -> Path | None:
+        """Check for metadata in nested construct/type structure.
+        
+        Args:
+            exercise_id: The exercise ID.
+            
+        Returns:
+            Path to metadata file if found, None otherwise.
+        """
+        for construct_dir in self.exercises_dir.iterdir():
+            if not construct_dir.is_dir():
+                continue
+            
+            for type_dir in construct_dir.iterdir():
+                if not type_dir.is_dir():
+                    continue
+                
+                readme = self._check_type_dir_for_metadata(type_dir, exercise_id)
+                if readme:
+                    return readme
+        
+        return None
+
     def _find_metadata_path(self, exercise_id: str) -> Path | None:
         """Find metadata path for an exercise.
         
@@ -30,16 +72,10 @@ class FileCollector:
         Returns:
             Path to metadata file if found, None otherwise.
         """
-        # Search through all constructs and types
-        for construct_dir in self.exercises_dir.iterdir():
-            if construct_dir.is_dir():
-                for type_dir in construct_dir.iterdir():
-                    if type_dir.is_dir():
-                        ex_dir = type_dir / exercise_id
-                        if ex_dir.exists():
-                            readme = ex_dir / "README.md"
-                            if readme.exists():
-                                return readme
+        # Search through nested structure first
+        nested_path = self._check_nested_metadata(exercise_id)
+        if nested_path:
+            return nested_path
         
         # Also check for flat structure (e.g., exercises/ex001_sanity/README.md)
         flat_path = self.exercises_dir / exercise_id / "README.md"

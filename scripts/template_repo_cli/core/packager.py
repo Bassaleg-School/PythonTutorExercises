@@ -70,6 +70,28 @@ class TemplatePackager:
                 dest = workspace / "exercises" / exercise_id / "README.md"
                 safe_copy_file(file_dict["metadata"], dest)
 
+    def _copy_single_file(self, filename: str, workspace: Path) -> None:
+        """Copy a single template file if it exists.
+        
+        Args:
+            filename: Name of the file to copy.
+            workspace: Destination workspace directory.
+        """
+        src = self.template_files_dir / filename
+        if src.exists():
+            safe_copy_file(src, workspace / filename)
+
+    def _copy_directory(self, dirname: str, workspace: Path) -> None:
+        """Copy a template directory if it exists.
+        
+        Args:
+            dirname: Name of the directory to copy.
+            workspace: Destination workspace directory.
+        """
+        src = self.template_files_dir / dirname
+        if src.exists():
+            safe_copy_directory(src, workspace / dirname)
+
     def copy_template_base_files(self, workspace: Path) -> None:
         """Copy base template files.
         
@@ -81,35 +103,15 @@ class TemplatePackager:
                 f"Template files directory not found: {self.template_files_dir}"
             )
         
-        # Copy pyproject.toml
-        src = self.template_files_dir / "pyproject.toml"
-        if src.exists():
-            safe_copy_file(src, workspace / "pyproject.toml")
+        # Copy individual files
+        self._copy_single_file("pyproject.toml", workspace)
+        self._copy_single_file("pytest.ini", workspace)
+        self._copy_single_file(".gitignore", workspace)
+        self._copy_single_file("INSTRUCTIONS.md", workspace)
         
-        # Copy pytest.ini
-        src = self.template_files_dir / "pytest.ini"
-        if src.exists():
-            safe_copy_file(src, workspace / "pytest.ini")
-        
-        # Copy .gitignore
-        src = self.template_files_dir / ".gitignore"
-        if src.exists():
-            safe_copy_file(src, workspace / ".gitignore")
-        
-        # Copy .vscode directory
-        src = self.template_files_dir / ".vscode"
-        if src.exists():
-            safe_copy_directory(src, workspace / ".vscode")
-        
-        # Copy .github directory
-        src = self.template_files_dir / ".github"
-        if src.exists():
-            safe_copy_directory(src, workspace / ".github")
-        
-        # Copy INSTRUCTIONS.md
-        src = self.template_files_dir / "INSTRUCTIONS.md"
-        if src.exists():
-            safe_copy_file(src, workspace / "INSTRUCTIONS.md")
+        # Copy directories
+        self._copy_directory(".vscode", workspace)
+        self._copy_directory(".github", workspace)
         
         # Copy notebook_grader.py to tests/
         src = self.repo_root / "tests" / "notebook_grader.py"
