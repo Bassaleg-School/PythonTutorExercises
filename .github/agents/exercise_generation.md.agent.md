@@ -159,32 +159,117 @@ Debugging exercises should be presented to students as a small notebook. The gra
 
 ### Modification Exercise Formats
 
-Normally, modification type exercises come after the debugging exercises when students have familiarised themselves with the basics of that particular construct. They provide students with working which they then need to modify to meet the expected output. As with the debugging exercises, they should start simple, requiring a single, straightforward modification and then gradaully increase in difficulty. 
+Normally, modification type exercises come after the debugging exercises when students have familiarised themselves with the basics of that particular construct. They provide students with working code which they then need to modify to meet the expected output. As with the debugging exercises, they should start simple, requiring a single, straightforward modification and then gradually increase in difficulty.
 
-Each exercise should follow the following format:
+Each exercise should follow the notebook JSON format below (so the grader can extract the tagged cell):
 
-## Exercise [x]
-
-### Working Code
-
-``` python
-{working code goes here}
+```json
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": { "language": "markdown" },
+      "source": [
+        "# Exercise 1 — Modify the function",
+        "The cell below shows working code. Modify the tagged student cell so it meets the task described."
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": { "language": "python" },
+      "source": [
+        "# Working Code",
+        "def greet(name):",
+        "    return 'Hello ' + name",
+        "",
+        "# Example (when unmodified):",
+        "# greet('Ana')  -> 'Hello Ana'"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": { "language": "markdown" },
+      "source": [
+        "### Task",
+        "Modify `greet()` so it returns the greeting in the form: \"Hello, NAME!\" where `NAME` is the uppercase version of the input.",
+        "",
+        "### Expected Output",
+        "When correct:",
+        "```\n        greet('Ana')  -> 'Hello, ANA!'\n        ```"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "language": "python",
+        "tags": ["exercise1"]
+      },
+      "source": [
+        "# YOUR CODE (student edits this cell)",
+        "def greet(name):",
+        "    \"\"\"Return a greeting for `name`.",
+        "",
+        "    Example:",
+        "      greet('Ana') -> 'Hello, ANA!'",
+        "    \"\"\"",
+        "    # Start from the working implementation below and modify it.",
+        "    return 'Hello ' + name"
+      ]
+    }
+  ]
+}
 ```
 
-### Task
+### Make Exercise Formats
 
-{ explanation of what needs to be modified}
+This is the final exercise type that builds on the skills developed in the previous debugging and modification exercises. If not specified, scan the repo for the preceding exercises to give yourself a feel for the scope of make problems you can create.
 
-### Expected Output
+As make problems are typically more difficult, you would normally generate 3–5 of these. Students are required to code a solution from scratch with only a brief description and expected output; the graded cell should provide a clear function skeleton for them to fill in.
 
-``` 
-{what the notebook cell should output when it's working as expected}
-```
-{any additional explanation if completely necessary}
+Below is a JSON-formatted example that matches the notebook format used by the generator and the test harness. The student is asked to implement `solve()` from scratch (a common pattern for make problems and the default expected by the tests).
 
-### Your code
-```python
-{a copy of the working code for students to modify accroding to the task}
+```json
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": { "language": "markdown" },
+      "source": [
+        "# Exercise 1 — Create a function",
+        "Write a function that computes the sum of squares of a list of integers."
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": { "language": "markdown" },
+      "source": [
+        "### Task",
+        "Implement `solve(nums)` which takes a list of integers and returns the sum of their squares.",
+        "",
+        "### Expected Output",
+        "When correct:",
+        "```\n        solve([1, 2, 3])  -> 14\n        ```"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "metadata": {
+        "language": "python",
+        "tags": ["exercise1"]
+      },
+      "source": [
+        "# YOUR CODE (student edits this cell)",
+        "def solve(nums):",
+        "    \"\"\"Return the sum of squares of the integers in `nums`.",
+        "",
+        "    Parameters:\n      nums (list[int]): list of integers\n",
+        "    Returns:\n      int: sum of squares\n",
+        "    Example:\n      solve([1,2,3]) -> 14\n    \"\"\"",
+        "    # Implement the function below\n    raise NotImplementedError()"
+      ]
+    }
+  ]
+}
 ```
 
 #### Notes on crafting exercises for all problem types.
@@ -192,6 +277,8 @@ Each exercise should follow the following format:
 - Each cell object includes `metadata.language` set to `python` or `markdown` to match our validator.
 - Student code should expose a small, pure function and include a clear docstring and example.
 - Tests will use `exec_tagged_code("notebooks/exNNN_slug.ipynb", tag="exercise1")` to extract and run the tagged cell.
+
+## Creating exercises - the process
 
 ## When asked to create an exercise
 1) Pick identifiers
