@@ -1,8 +1,8 @@
 ---
 name: Exercise Generation
 description: Generate notebook-first Python exercises (tagged cells + pytest grading)
+tools: []
 ---
-
 # Bassaleg Python Tutor — Exercise Generation Mode
 
 You are helping a teacher create new Python exercises in this repository.
@@ -73,6 +73,56 @@ Test design checklist
 - In tests, parameterize tags:
   - `@pytest.mark.parametrize("tag", ["exercise1", "exercise2"])`
 - Each tagged cell should define `solve()` (cell-local namespace). If you want different function names per part (e.g. `solve1`, `solve2`), update the tests accordingly.
+
+### Generating and testing a 10-part notebook (recommended workflow)
+- When the teacher requests a notebook with 10 exercises, use `--parts 10`:
+  - `python scripts/new_exercise.py exNNN "Title" --slug your_slug --parts 10`
+- The generator will scaffold `exercise1` through `exercise10` cells. Follow these rules to keep things consistent and fast:
+  - Each exercise part should live in its own single **student-tagged** cell (use `# STUDENT exerciseK` or a `exerciseK` tag).
+  - Prefer a single small, pure function per part named `solve()` that returns a deterministic value.
+  - Keep each exercise fast to test (simple operations, no heavy IO or large loops) so the whole test suite remains snappy.
+
+#### Testing pattern for 10 parts
+- Use `exec_tagged_code` in tests and parametrize over all 10 tags. Example minimal pattern:
+
+```python
+import pytest
+from tests.notebook_grader import exec_tagged_code
+
+TAGS = [f"exercise{i}" for i in range(1, 11)]
+
+@pytest.mark.parametrize("tag", TAGS)
+def test_exercises_tagged_cell_exists(tag):
+    ns = exec_tagged_code("notebooks/exNNN_slug.ipynb", tag=tag)
+    assert "solve" in ns, f"Missing solve() in {tag}"
+
+# For behaviour tests, parametrize with (tag, inputs, expected)
+@pytest.mark.parametrize(
+    "tag,input,expected",
+    [
+        ("exercise1", 1, 2),
+        ("exercise2", [1, 2], 3),
+        # add cases for other exercises
+    ],
+)
+def test_exercise_behaviour(tag, input, expected):
+    ns = exec_tagged_code("notebooks/exNNN_slug.ipynb", tag=tag)
+    result = ns["solve"](input)
+    assert result == expected
+```
+
+- Structure behavioural tests so each part has at least:
+  - 3 positive tests
+  - 2 edge cases
+  - 1 invalid/wrong-type case (where appropriate)
+- Keep test inputs small and deterministic. If a given part requires more complex fixtures, factor them out into helper functions but avoid expensive setup in per-test loops.
+
+#### Performance and CI
+- Try to keep the total runtime for all tests in a multi-part notebook reasonable (ideally < 1s per test). If many tests are required, prefer grouping where a single parametrized test covers multiple cases to reduce overhead.
+
+#### Notes on naming and readability
+- Using `solve()` consistently across parts makes tests simpler; if you diverge, update the tests to look for the correct name.
+- Clearly document each exercise prompt in the notebook so students know which `exerciseK` they are solving.
 
 ## Output expectations
 - When generating notebook content in-chat, output valid notebook JSON.
