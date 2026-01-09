@@ -103,7 +103,7 @@ class TestCollectFileStructure:
 
         # Metadata should be in construct/type/exercise structure
         if files.get("metadata"):
-            assert "sequence" in str(files["metadata"]) or True  # Flexible
+            assert "sequence" in str(files["metadata"])
 
 
 class TestCollectValidation:
