@@ -30,7 +30,7 @@ env/
 *.ipynb_checkpoints
 
 # IDE
-.vscode/
+# .vscode/ directory is kept for project configuration
 .idea/
 *.swp
 *.swo
