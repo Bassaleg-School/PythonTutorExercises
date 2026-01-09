@@ -48,36 +48,43 @@ def validate_type_name(type_name: str) -> bool:
 
 
 def validate_repo_name(repo_name: str) -> bool:
-    """Validate GitHub repository name.
+    """Validate repository name against this project's convention.
     
-    GitHub repo names must:
+    Our classroom repositories use a simplified, GitHub-compatible
+    naming convention for consistency:
     - Only contain lowercase alphanumeric characters, hyphens, or underscores
-    - Not be empty
+    - Must not be empty
+    
+    Note:
+        GitHub itself is more permissive (e.g. allows mixed case), but we
+        intentionally enforce this stricter convention here.
     
     Args:
         repo_name: The repository name to validate.
         
     Returns:
-        True if valid, False otherwise.
+        True if valid under this convention, False otherwise.
     """
     if not repo_name:
         return False
-    # GitHub allows lowercase alphanumeric, hyphens, and underscores
+    # Our convention: lowercase alphanumeric, hyphens, and underscores
+    # (stricter than GitHub's actual repository name rules).
     pattern = r"^[a-z0-9_-]+$"
     return bool(re.match(pattern, repo_name))
 
 
 def sanitize_repo_name(repo_name: str) -> str:
-    """Sanitize repository name to valid format.
+    """Sanitize repository name to this project's canonical format.
     
     Converts to lowercase, replaces spaces with hyphens,
-    removes special characters, and collapses multiple hyphens.
+    removes special characters, and collapses multiple hyphens
+    to produce a repository slug that matches ``validate_repo_name``.
     
     Args:
-        repo_name: The repository name to sanitize.
+        repo_name: The repository name (or arbitrary string) to sanitize.
         
     Returns:
-        Sanitized repository name.
+        Sanitized repository name following our lowercase convention.
     """
     # Convert to lowercase
     name = repo_name.lower()
